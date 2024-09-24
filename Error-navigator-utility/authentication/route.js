@@ -1,33 +1,21 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const { login } = require('./auth');
-const mysqlConnection = require('../utils/database');
+const { login , authenticateToken } = require('./auth');
 const jwt = require('jsonwebtoken');
-//const jwtSecret = ?;
+const mysqlConnection = require('../utils/database');
 
 //Create login route
-router.route('/login').post(login);
+router.post('/login', login);
 
-//Authenticate user
-router.post('/login', (req, res) => {
-    const { staffid, password } = req.params;
-    const sql = 'SELECT * FROM users WHERE staffid = ? AND password = ?';
-    const user = {user: staffid, password: password};
-
-    mysqlConnection.query(sql, staffid, (err, results, fields) => {
-        if (!err) {
-            if (results.length > 0) {
-                res.send(results);
-            } else {
-                res.status(404).send('User not found');
-            }
-        } else {
-            console.log(err);
-            res.status(500).send('Error retrieving user');
-        }
+//Create protected user route
+router.get('/user', authenticateToken, (req, res) => { 
+    const { staffid } = req.body;
+    
+    mysqlConnection.query('SELECT * FROM users WHERE staffid = ?', [staffid], (error, results) => {
+        if (error) throw error;
+        res.json(results);
     });
 });
-
-//Authorise user
-
+    
 module.exports = router;

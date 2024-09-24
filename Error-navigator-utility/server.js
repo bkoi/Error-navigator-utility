@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const transactionRoutes = require('./routes/transactions');
 const userRoutes = require('./routes/users');
 const authRoutes = require('./authentication/route');
-const PORT = 8080
+const PORT = 3000;
 
 const app = express();
 

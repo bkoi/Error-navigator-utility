@@ -70,4 +70,4 @@ router.delete('/transactions/:messageid', (req, res) => {
     });
 });
 
-module.exports = router
+module.exports = router;
