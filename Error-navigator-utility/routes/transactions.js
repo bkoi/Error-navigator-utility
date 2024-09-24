@@ -19,7 +19,7 @@ router.get('/transactions', (req, res) => {
 
 //View single transaction
 router.get('/transactions/:messageid', (req, res) => {
-    const { messageidid } = req.params;
+    const { messageid } = req.params;
     const sql = 'SELECT * FROM transactions WHERE messageid = ?';
 
     mysqlConnection.query(sql, messageid, (err, results, fields) => {

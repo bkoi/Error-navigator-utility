@@ -21,21 +21,21 @@
             <div class="container-fluid bg-body-navbar">
                 <div class="row align-items-center justify-content-center">
                     <div class=""col-10 col-sm-8 mb-3">
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">                                                                                                              <span class="navbar-toggler-icon"></span>   
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">                                                                        <span class="navbar-toggler-icon"></span>   
                         </button>
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="frontend/index.html">Home</a>
+                                    <a class="nav-link" href="index.html">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="frontend/search.html">Cancel</a>
+                                    <a class="nav-link" href="search.html">Search</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="frontend/search.html">Reload</a>
+                                    <a class="nav-link active" aria-current="page" href="search.html">Reload</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="frontend/logout.html">Logout</a>
+                                    <a class="nav-link" href="logout.html">Logout</a>
                                 </li>
                             </ul>
                         </div>
@@ -63,25 +63,22 @@
                     </div>
                     <div class="form-group row justify-content-around">
                         <div class="col-4 mb-2">
-                            <label for="e2eEnvironment"><h6>E2EEnv<span class="control-label"></span></h6></label>
+                            <label for="e2eEnvironment"><h6>E2E Environment<span class="control-label"></span></h6></label>
                         </div>
                         <div class="col-6">
                             <select class="selecter">
                                 <option selected><h6>Choose an environment</h6></option required>
-                                <option value="SIT1"><h6>SIT1</h6></option>
                                 <option value="SIT2"><h6>SIT2</h6></option>
-                                <option value="SIT3"><h6>SIT3</h6></option>
-                                <option value="SIT4"><h6>SIT4</h6></option> 
                             </select>>
                         </div>
                     </div>
                     <div class="form-group row justify-content-around">
                         <div class="col-4 mb-2">
-                            <label for="referenceName"><h6>ref_name<span class="control-label"></span></h6></label>
+                            <label for="referenceName"><h6>reference name<span class="control-label"></span></h6></label>
                         </div>
                         <div class="col-6">
                             <select class="selecter">
-                                <option selected><h6>Choose a ref_name</h6></option required>
+                                <option selected><h6>Choose a reference name</h6></option required>
                                 <option value="F20"><h6>F20</h6></option>
                                 <option value="MSGID"><h6>MSGID</h6></option>
                                 <option value="UETR"><h6>UETR</h6></option>
@@ -89,25 +86,25 @@
                         </div>
                     </div>
                     <div class="form-group row justify-content-around"></div>
-                        <div class="col-4 mb-2">
+                        <div class="col-6 mb-2">
                             <label for="date"><h6>date<span class="control-label"></span></h6></label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 mb-2">
                             <input type="date" id="date" name="date" class="selecter" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
                     <div class="row align-items-center justify-content-center mt-5">
                         <div class="col-3 col-sm-2 d-flex rounded btn-text-center">
-                            <button type="button" class="btn submit-btn" onclick="callToBackEnd(this)">Search</button>
+                            <button type="button" class="btn submit-btn">Search</button>
                         </div>
                         <div class="col-3 col-sm-2 d-flex rounded btn-text-center">
-                            <button type="button" class="btn submit-btn" onclick="reloadPage(this)">Cancel</button>
+                            <button type="button" class="btn submit-btn">Update</button>
                         </div>
                         <div class="col-3 col-sm-2 d-flex rounded btn-text-center">
-                            <button type="button" class="btn submit-btn" onclick="reloadPage(this)">Reload</button>
+                            <button type="button" class="btn submit-btn">Delete</button>
                         </div>
                         <div class="col-3 col-sm-2 d-flex rounded btn-text-center">
-                            <button type="button" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
+                            <button type="button" class="btn submit-btn">Logout</button>
                         </div>
                     </div>
                 </form>
@@ -117,7 +114,7 @@
          <footer class="sticky-footer">
             <div class="row align-items-center justify-content-center"> 
                 <div class="col-10 col-sm-8 mb-5">
-                    <h6 class="col-10 col-sm-8 mb-5">This project is for educational purposes only and has been created for the Firebrand Software Engineering Apprenticeship EPA.</h6>
+                    <h6>This project is for educational purposes only and has been created for the Firebrand Software Engineering Apprenticeship EPA.</h6>
                 </div>
             </div>
         </footer>

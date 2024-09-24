@@ -26,16 +26,42 @@
         </script>
     </head>
     <body>
-        <!--Header-->
-        <header>
-            <div class="navbar hidden mt-5 py-5">
+         <!--Header with Hamburger Navbar-->
+         <header>
+            <div class="navbar hidden py-5"></div>
         </header>
+        <nav class="navbar">
+            <div class="container-fluid bg-body-navbar">
+                <div class="row align-items-center justify-content-center">
+                    <div class=""col-10 col-sm-8 mb-3">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">                                                                       <span class="navbar-toggler-icon"></span>   
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="index.html">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="search.html">Search</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="search.html">Reload</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="logout.html">Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
         <!--Login with user id, password (hard-coded) & submit button -->
         <div class="container mt-5 py-5">
             <section>
                 <div class="row align-items-center justify-content-center">
                     <div class="col-10 col-sm-8 mb-3">
-                        <h1 class="text-center">Error Navigator</h1>
+                        <h1 class="text-center">Error Navigator Login</h1>
                     </div>
                 </div>
             </section>
@@ -67,7 +93,7 @@
         <footer class="sticky-footer">
             <div class="row align-items-center justify-content-center"> 
                 <div class="col-10 col-sm-8 mb-5">
-                    <h6 class="col-10 col-sm-8 mb-5">This project is for educational purposes only and has been created for the Firebrand Software Engineering Apprenticeship EPA.</h6>
+                    <h6>This project is for educational purposes only and has been created for the Firebrand Software Engineering Apprenticeship EPA.</h6>
                 </div>
             </div>
         </footer>
