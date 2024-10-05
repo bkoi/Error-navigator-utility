@@ -13,6 +13,13 @@ body {
     color: #fff;
     min-height: 100vh;
     margin: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex-grow: 1;
+    height: 100%;
 }
 
 .bg-body-navbar {
@@ -39,7 +46,11 @@ body {
     color: #fff;
 }
 
-.nav-link {
+#home-link,
+#search-link,
+#result-link,
+.nav-link:hover{
+    background-color: #8a1c69;
     color: #fff;
 }
 
@@ -55,23 +66,71 @@ body {
 .submit-btn {
     background-color: #fff;
     color: #2c3e50;
+    font-weight: 500;
 }
 
-submit-btn:hover {
-    background-color: orange;
+.submit-btn:hover {
+    background-color: #8a1c69;
+}
+
+#button-container {
+    display: grid;
+    grid-template-columns: repeat(4, 0fr);
 }
 
 #result {
-    border-width: 1px;
-    border-style: solid;
+    border-width: 5px;
+    border-style: ridge;
     border-color: #fff;
     border-radius: 10px;
     height: 15vh;
-    width: 50vw;
+    width: 83vw;
+}
+
+#result-area {
+    width: 80vw;
 }
 
 .sticky-footer {
     position: sticky;
     top: 100%;
     margin: 5px;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .sticky-footer {
+        padding: 5px 0;
+        font-size: 0.5rem;
+    }
+    .submit-btn {
+        font-size: 0.7rem;
+    }
+    #button-container {
+        grid-template-columns: repeat(2, 0fr);
+        height: 0.33vh;
+        width: 0.33vw;
+    }
+    p {
+        display: none;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .sticky-footer {
+        padding: 7px 0;
+        font-size: 0.7rem;
+    }
+    .submit-btn {
+        font-size: 0.8rem;
+    }
+}
+@media (min-width: 769px) {
+    .sticky-footer {
+        padding: 8px 0;
+        font-size: 0.8rem;
+    }
+    .submit-btn {
+        font-size: 1rem;
+    }
 }

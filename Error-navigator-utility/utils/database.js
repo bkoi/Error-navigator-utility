@@ -11,6 +11,7 @@ const mysql = require('mysql');
 });
 */
 //Create connection to database
+/*
 const mysqlConnection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -29,3 +30,26 @@ mysqlConnection.connect((err) => {
 });
 
 module.exports = mysqlConnection;
+*/
+
+const connectDB = async () => {
+    const pool = mysql.createPool( {
+        connectionLimit: 10,
+        host: 'localhost',
+        user: 'root',
+        database: 'error_navigator',
+        password: '15Greece!Aeg',
+        multipleStatements: true,
+    });
+
+    pool.getConnection((error, connection) => {
+        if (error) {
+            console.log({ error: error.message });
+        }
+            
+        console.log('Connected to MySQL database');
+        console.release();
+    });
+};
+
+module.exports = connectDB;

@@ -10,10 +10,12 @@ router.post('/login', login);
 
 //Create protected user route
 router.get('/user', authenticateToken, (req, res) => { 
-    const { staffid } = req.body;
+    const { staffid } = req.user;
     
-    mysqlConnection.query('SELECT * FROM users WHERE staffid = ?', [staffid], (error, results) => {
-        if (error) throw error;
+    mysqlConnection.execute('SELECT * FROM users WHERE staffid = ?', [staffid], (error, results) => {
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
         res.json(results);
     });
 });

@@ -1,10 +1,11 @@
 require('dotenv').config();
 const mysqlConnection = require('../utils/database');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 //Login function
-const login = (req, res, next) => {
+const login = async(req, res) => {
     const { staffid, password } = req.body;
 
     if (!staffid || !password) {
@@ -13,11 +14,10 @@ const login = (req, res, next) => {
         });
     }
 
-    mysqlConnection.query('SELECT * FROM users WHERE staffid = ?', [staffid], (error, rows, fields) => {
-        if(error) return res.status(500).json({ error:error });
-        
+    try {
+        const rows = await mysqlConnection.execute('SELECT * FROM users WHERE staffid = ?', [staffid]);
         const user = rows[0];
-        
+
         if (!user) {
             return res.status(401).json({
                 message: 'Invalid staffid or password',
@@ -25,21 +25,22 @@ const login = (req, res, next) => {
             });
         }
         
-        const isMatch = bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.status(401).json({
-                    message: 'Invalid staffid or password',
-                    error: 'Incorrect password',
-                });
-            } else {
-                const accessToken = jwt.sign({ staffid: user.staffid }, process.env.ACCESS_TOKEN_SECRET);
-                res.json({ accessToken: accessToken });
-                res.json({message: 'Login successful'});
-                next();
-            }
-    });
-}
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({
+                message: 'Invalid staffid or password',
+                error: 'Incorrect password',
+            });
+        }
 
+        const accessToken = jwt.sign({ staffid: user.staffid }, process.env.ACCESS_TOKEN_SECRET);
+        return res.json({ message: 'Login successful', accessToken });
+        
+    } catch (error) {
+         return res.status(500).json({ error:error });
+    }          
+}
+/*
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -52,5 +53,5 @@ const authenticateToken = (req, res, next) => {
     });
 }
 
-module.exports = { login };
-module.exports = { authenticateToken };
+module.exports = { login, authenticateToken };
+*/
