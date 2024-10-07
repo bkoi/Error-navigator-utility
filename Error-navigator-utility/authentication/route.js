@@ -1,23 +1,25 @@
-require('dotenv').config();
 const express = require('express');
+const { login, authenticateToken } = require('./auth');
 const router = express.Router();
-const { login , authenticateToken } = require('./auth');
-const jwt = require('jsonwebtoken');
-const mysqlConnection = require('../utils/database');
 
-//Create login route
+//Login route
 router.post('/login', login);
 
-//Create protected user route
-router.get('/user', authenticateToken, (req, res) => { 
-    const { staffid } = req.user;
-    
-    mysqlConnection.execute('SELECT * FROM users WHERE staffid = ?', [staffid], (error, results) => {
-        if (error) {
-            return res.status(500).json({ error: error.message });
-        }
-        res.json(results);
-    });
+//Admin authentication
+router.get('/admin', authenticateToken, (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Access denied' });  
+    }
+    res.status(200).json({ message: 'Access granted' });
 });
-    
+
+router.get('/business_user', authenticateToken, (req, res) => {
+    if (req.user.role !== 'business_user') {
+        return res.status(403).json({ message: 'Access denied' });  
+    }
+    res.status(200).json({ message: 'Access granted' });
+});
+
 module.exports = router;
+
+
