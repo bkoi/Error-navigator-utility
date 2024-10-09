@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const config = require('./config');
 
 let pool;
@@ -12,6 +12,7 @@ const connectDB = async () => {
 
 const disconnectDB = async () => {
     if (pool) {
+        console.log('Closing connection pool');
         await pool.end((error) => {
             if(error) {
                 console.error('Error closing the connection pool: ', error);

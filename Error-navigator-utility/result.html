@@ -15,23 +15,17 @@
                 window.location.href ='/search';   
             };
             function navigateToLogOut(event) {
+            fetch('close-connection', { 
+                method: 'POST'
+            }).then(response => {
                 alert("You are logged out.");
-                window.location.href ='/';
+                window.location.href = '/index';
+            }).catch(error => {
+                console.error('Error closing connection', error);
+                alert("Error logging out, but you are still logged out.");
+                window.location.href = '/index';
+                });
             };
-            window.addEventListener('beforeunload', function(event) {
-                console.log('beforeunload event triggered');
-                setTimeout(function() {
-                    console.log('Close connection request would be sent here');
-                    fetch('close-connection', { 
-                        method: 'POST',
-                        keepalive: true
-                    }).then(response => {
-                        console.log('Close connection request sent', response);
-                    }).catch(error => {
-                        console.error('Error sending close connection request', error);
-                    });
-                }, 2000)
-            });
         </script>
     </head>
     <body>
