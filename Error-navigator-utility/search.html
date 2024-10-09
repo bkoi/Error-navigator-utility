@@ -14,8 +14,23 @@
         <script>
             function navigateToLogOut(event) {
                 alert("You are logged out.");
-                window.location.href ='index.html';
-            }
+                window.location.href ='/';
+            };
+
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered');
+                setTimeout(function() {
+                    console.log('Close connection request would be sent here');
+                    fetch('close-connection', { 
+                        method: 'POST',
+                        keepalive: true
+                    }).then(response => {
+                        console.log('Close connection request sent', response);
+                    }).catch(error => {
+                        console.error('Error sending close connection request', error);
+                    });
+                }, 2000)
+            });
         </script>
     </head>
     <body>
@@ -32,16 +47,16 @@
                         <div class="collapse navbar-collapse d-sm-block" id="navbarNav">
                             <ul class="navbar-nav nav-pills">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="index.html">Home</a>
+                                    <a class="nav-link" href="/index">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="search-link" aria-current="page" href="search.html">Search</a>
+                                    <a class="nav-link active" id="search-link" aria-current="page" href="/search">Search</a>
                                 </li>
                                 <li class="nav-item"></li>
-                                    <a class="nav-link" href="result.html">Result</a>
+                                    <a class="nav-link" href="/result">Result</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="search.html">Reload</a>
+                                    <a class="nav-link" href="/search">Reload</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" onclick="navigateToLogOut(this)">Logout</a>
