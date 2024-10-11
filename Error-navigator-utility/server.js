@@ -24,7 +24,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'assets')));
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false })); 
+app.use(express.urlencoded({ extended: true })); 
 app.use('/auth', authRoutes);
 //app.use(userRoutes);
 //app.use(transactionsRoutes);
@@ -45,8 +45,8 @@ const gracefulShutdown = async (signal) => {
 };
 
 // Error handler for unhandledRejection errors
-process.on('unhandledRejection', err => {
-    console.log(`Unhandled Rejection: ${err.message}`);
+process.on('unhandledRejection', error => {
+    console.log(`Unhandled Rejection: ${error.message}`);
     gracefulShutdown('unhandledRejection'); 
 });
 
@@ -76,6 +76,31 @@ app.get('/search', (req, res) => {
 
 app.get('/result', (req, res) => {
     res.sendFile(path.join(__dirname, 'result.html'));
+});
+
+app.post('/login-form', (req, res, next) => {
+    const { staffid, password } = req.body;
+
+    // Forward the request to the /auth/login headers
+    fetch('http://localhost:' + port + '/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'staffid': staffid,
+            'password': password
+        }
+    }).then(response => {
+            if (response.ok) {
+                // Redirect to search page if successful
+                res.redirect('/search');
+            } else {
+                // Handle login failure
+                res.status(401).send('Login failed.');
+            }
+    }).catch(error => {
+            console.error('Error forwarding request:', error);
+            res.status(500).send('Server error during login.');
+    });
 });
 
 const server = app.listen(port, () => console.log(`Server connected to port ${port}`));

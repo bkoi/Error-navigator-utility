@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="/css/style.css" type="text/css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <title>Error Navigator Login</title>
-        <!-- Script for user fomr validation and user logout -->
+        <!-- Script for user form validation and user logout -->
         <script>
             let loginAttempts = 0;
             const maxAttempts = 3;
@@ -22,7 +22,7 @@
             };
 
             function validatePassword(password) {
-                const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{12,}$/;
+                const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#()^])[A-Za-z\d@$!%*?&#()^]{12,}$/;
                 return regex.test(password);
             };
             
@@ -38,7 +38,7 @@
                         default: return char;
                     }
                 });
-            }
+            };
 
             function validateForm() {
                 const rawStaffid = document.getElementById('staffid').value;
@@ -134,18 +134,18 @@
             </section>
             <section>
                 <div>
-                    <form id="loginForm" action="/login" method="POST" onsubmit="return validateForm(this)">
+                    <form id="loginForm" action="/login-form" method="POST" onsubmit="return validateForm()">
                         <div class="row align-items-center justify-content-center">
                             <div class="col-10 col-sm-8 rounded mb-3">
                                 <label for="staffid" class="form-label control-label"><strong>Staff ID</strong></label>
-                                <input type="text" class="form-control" name="staffid" id="staffid">
+                                <input type="text" class="form-control" name="staffid" id="staffid" required>
                                 <span id="staffidError" class="alert"></span>   
                             </div>
                         </div>
                         <div class="row align-items-center justify-content-center">
                             <div class="col-10 col-sm-8 rounded mb-3">
                                 <label for="password" class="form-label control-label"><strong>Password</strong></label>
-                                <input type="password" class="form-control" name="password" id="password">
+                                <input type="password" class="form-control" name="password" id="password"required>
                                  <span id="passwordError" class="alert"></span>  
                             </div>
                         </div>
