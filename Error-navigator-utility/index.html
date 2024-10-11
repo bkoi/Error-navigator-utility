@@ -10,19 +10,71 @@
         <link rel="stylesheet" href="/css/style.css" type="text/css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <title>Error Navigator Login</title>
-        <!-- Script for user access validation / needs to be reworked-->
+        <!-- Script for user fomr validation and user logout -->
         <script>
-            function navigateToSearch(event) {
+            let loginAttempts = 0;
+            const maxAttempts = 3;
+            const lockoutTime = 30000;
 
-                let staffid = document.getElementById('staffid').value;
-                let password = document.getElementById('password').value;
-
-                if (staffid === 'user123' && password === 'password123') {
-                    window.location.href ='/search';
-                } else {
-                    alert('Staff ID and password don\'t match. Please try again.');
-                }
+            function validateStaffid(staffid) {
+                const regex = /^\d{8}$/;
+                return regex.test(staffid);
             };
+
+            function validatePassword(password) {
+                const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{12,}$/;
+                return regex.test(password);
+            };
+            
+            function sanitizeStaffid(staffid) {
+                return staffid.replace(/[&<>"'/]/g, function (char) {
+                    switch (char) {
+                        case '&': return '&amp;';
+                        case '<': return '&lt;';
+                        case '>': return '&gt;';
+                        case '"': return '&quot;';
+                        case "'": return '&#39;';
+                        case '/': return '&#x2F;';
+                        default: return char;
+                    }
+                });
+            }
+
+            function validateForm() {
+                const rawStaffid = document.getElementById('staffid').value;
+                const rawPassword = document.getElementById('password').value;
+                const staffid = sanitizeStaffid(rawStaffid);
+                const password = rawPassword;
+                const staffidError = document.getElementById('staffidError');
+                const passwordError = document.getElementById('passwordError');
+
+                let valid = true;
+
+                if (!validateStaffid(staffid)) {
+                    staffidError.textContent = 'Staff ID must be 8 digits long';
+                    valid = false;
+                } else {
+                    staffidError.textContent = '';
+                }
+
+                if (!validatePassword(password)) {
+                    passwordError.textContent = 'Password must be at least 12 characters long, containing letters, numbers,and at least one special character.';
+                    valid = false;
+                } else {
+                    passwordError.textContent = '';
+                }
+                if (valid) {
+                    if (loginAttempts >= maxAttempts) {
+                        alert('Too many failed login attempts. Please try again later.');
+                        return false;
+                    }
+                    loginAttempts++;
+                    setTimeout(() => { loginAttempts = 0; }, lockoutTime);
+                    return true; // Allows form submission 
+                    }
+                return false; // Prevents form submission if not valid
+            };  
+                
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'
@@ -63,7 +115,7 @@
                                     <a class="nav-link" href="/search">Reload</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" onclick="navigateToLogOut(this)">Logout</a>
+                                    <a class="nav-link" onclick="navigateToLogOut()">Logout</a>
                                 </li>
                             </ul>
                         </div>
@@ -82,21 +134,23 @@
             </section>
             <section>
                 <div>
-                    <form>
+                    <form id="loginForm" action="/login" method="POST" onsubmit="return validateForm(this)">
                         <div class="row align-items-center justify-content-center">
                             <div class="col-10 col-sm-8 rounded mb-3">
-                                <label for="staffid" class="form-label"><strong>Staff ID</strong></label>
+                                <label for="staffid" class="form-label control-label"><strong>Staff ID</strong></label>
                                 <input type="text" class="form-control" name="staffid" id="staffid">
+                                <span id="staffidError" class="alert"></span>   
                             </div>
                         </div>
                         <div class="row align-items-center justify-content-center">
                             <div class="col-10 col-sm-8 rounded mb-3">
-                                <label for="password" class="form-label"><strong>Password</strong></label>
+                                <label for="password" class="form-label control-label"><strong>Password</strong></label>
                                 <input type="password" class="form-control" name="password" id="password">
+                                 <span id="passwordError" class="alert"></span>  
                             </div>
                         </div>
                         <div class="col-4 col-sm-2 d-flex align-content-center mx-auto mb-3">
-                            <button type="button" class="btn submit-btn" onclick="navigateToSearch(this)">Submit</button>
+                            <button type="submit" class="btn submit-btn">Submit</button>
                         </div>
                     </form>
                 </div>

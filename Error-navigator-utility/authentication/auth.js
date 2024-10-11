@@ -6,7 +6,7 @@ const { checkRecordExists, updateRecord, generateAccessToken } = require('../uti
 const login = async (req, res) => {
     const staffid = req.headers['staffid'];
     const password = req.headers['password'];
-    const salt = 10;
+    //const salt = 10;
 
     if (!staffid || !password) {
         return res.status(400).json({ error: 'Staff ID or password field cannot be empty' });
@@ -16,9 +16,10 @@ const login = async (req, res) => {
         const existingUser = await checkRecordExists('users', 'staffid', staffid);
         //console.log(existingUser);
         if (!existingUser) {
-            return res.status(401).json({ error: 'Incorrect credentials' });
+            return res.status(401).json({ error: 'Staff Id and password do not match. Please try again' });
         }
-        console.log(await bcrypt.hash(password, salt));
+
+        //console.log(await bcrypt.hash(password, salt));
         //Check the password
         const passwordMatch = await bcrypt.compare(password, existingUser.password);
         if (!passwordMatch) {
@@ -32,12 +33,21 @@ const login = async (req, res) => {
             { expiresIn: '15m' }
         );
 
-        res.status(200).json({
-            message: 'Login successful',
-            staffid: existingUser.staffid,
-            access_token: accessToken,
-        });
+        //Store JWT in session
+        req.session.user ={
+            staffid: existingUser.staffid, 
+            role: existingUser.role,
+            token: accessToken
+        };
+        //Redirect based on user role
+        if (existingUser.role === 'admin' || existingUser.role) {
+            return res.redirect('/search');
+        } else {
+            console.log('Unauthorized role: ' , staffid);
+            return res.status(403).send('Your accounr does not have access to this application. Please contact your administrator.');
+        }
     } catch (error) {
+        console.log(' Error during login: ', error);
         return res.status(500).json({ error: error.message });
     }
 };

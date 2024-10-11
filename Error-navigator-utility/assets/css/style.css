@@ -63,6 +63,9 @@ body {
     color: #ff0000;
 }
 
+.alert {
+    color: #ff0000;
+}
 .submit-btn {
     background-color: #fff;
     color: #2c3e50;

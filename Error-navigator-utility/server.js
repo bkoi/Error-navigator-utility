@@ -7,9 +7,19 @@ dotenv.config();
 const { connectDB, disconnectDB } = require('./utils/database');
 //const userRoutes = require('./routes/users');
 // const transactionsRoutes = require('./routes/transactions');
+const session = require('express-session');
+const crypto = require('crypto');
+//const sessionSecret = crypto.randomBytes(32).toString('hex');
 const port = process.env.PORT;
 
 const app = express();
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }  // Set this to true if using HTTPS
+}));
 
 app.use(express.static(path.join(__dirname, 'assets')));
 app.use(cors());
@@ -20,6 +30,7 @@ app.use('/auth', authRoutes);
 //app.use(transactionsRoutes);
 
 connectDB();
+
 //Function to gracefully shutdown the database connection
 const gracefulShutdown = async (signal) => {
     console.log(`Received ${signal}. Closing database connection...`);
@@ -47,8 +58,8 @@ app.post('/close-connection', async (req, res) => {
 });
 
 // Gracefully handle termination signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 // Exit handler
 process.on('exit', (code) => {
