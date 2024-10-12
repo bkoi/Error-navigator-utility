@@ -22,7 +22,7 @@
             };
 
             function validatePassword(password) {
-                const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#()^])[A-Za-z\d@$!%*?&#()^]{12,}$/;
+                const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#()^|])[A-Za-z\d@$!%*?&#()^|]{12,}$/;
                 return regex.test(password);
             };
             
@@ -53,7 +53,6 @@
                 if (!validateStaffid(staffid)) {
                     staffidError.textContent = 'Staff ID must be 8 digits long';
                     valid = false;
-                    console.log(staffidError);
                 } else {
                     staffidError.textContent = '';
                 }
@@ -61,20 +60,19 @@
                 if (!validatePassword(password)) {
                     passwordError.textContent = 'Password must be at least 12 characters long, containing letters, numbers,and at least one special character.';
                     valid = false;
-                    console.log(passwordError);
                 } else {
                     passwordError.textContent = '';
                 }
                 if (valid) {
                     if (loginAttempts >= maxAttempts) {
                         alert('Too many failed login attempts. Please try again later.');
-                        return false;
+                        return false; 
                     }
                     loginAttempts++;
                     setTimeout(() => { loginAttempts = 0; }, lockoutTime);
-                    return true; // Allows form submission 
+                    return true; 
                     }
-                return false; // Prevents form submission if not valid
+                return false; 
             };  
                 
             function navigateToLogOut(event) {

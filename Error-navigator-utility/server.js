@@ -10,6 +10,7 @@ const { connectDB, disconnectDB } = require('./utils/database');
 const session = require('express-session');
 const crypto = require('crypto');
 //const sessionSecret = crypto.randomBytes(32).toString('hex');
+const http = require('http');
 const port = process.env.PORT;
 
 const app = express();
@@ -17,7 +18,7 @@ const app = express();
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { secure: false }  // Set this to true if using HTTPS
 }));
 
@@ -81,26 +82,50 @@ app.get('/result', (req, res) => {
 app.post('/login-form', (req, res, next) => {
     const { staffid, password } = req.body;
 
-    // Forward the request to the /auth/login headers
-    fetch('http://localhost:' + port + '/auth/login', {
+    if(!staffid || !password) {
+        return res.status(400).json('Staff ID or password field cannot be empty');
+    }
+
+    const options = {
+        hostname: 'localhost',
+        port: port,
+        path: '/auth/login',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'staffid': staffid,
             'password': password
         }
-    }).then(response => {
-            if (response.ok) {
-                // Redirect to search page if successful
+    };
+
+    const loginRequest = http.request(options, (loginResponse) => {
+        let data = '';
+
+        loginResponse.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        loginResponse.on('end', () => {
+            console.log('Response from /auth/login:', loginResponse.statusCode, data);
+
+            if (loginResponse.statusCode === 302) {
+                const location = loginResponse.headers.location;
+                console.log('Redirected to:', location);
+                res.redirect(location);
+            } else if(loginResponse.statusCode === 200) {
                 res.redirect('/search');
             } else {
-                // Handle login failure
                 res.status(401).send('Login failed.');
-            }
-    }).catch(error => {
-            console.error('Error forwarding request:', error);
-            res.status(500).send('Server error during login.');
+            }   
+        }); 
+    }); 
+
+    loginRequest.on('error', (error) => {
+        console.error('Error forwarding request:', error);
+        res.status(500).send('Server error during login.');
     });
+
+    loginRequest.end(); 
 });
 
 const server = app.listen(port, () => console.log(`Server connected to port ${port}`));

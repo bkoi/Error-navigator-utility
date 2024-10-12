@@ -17,13 +17,13 @@
                 const refValue = document.getElementById('ref_value');
 
                 if (refName === 'F20') {
-                    refValue.placeholder = "Enter F20 (16 characters)";
+                    refValue.placeholder = "Enter F20";
                     refValue.pattern = "[A-Za-z0-9]{16}"; 
                 } else if (refName === 'MSGID') {
-                    refValue.placeholder = "Enter MSGID (e.g., E103240906170945)";
+                    refValue.placeholder = "Enter MSGID";
                     refValue.pattern = "[A-Za-z0-9]{15,50}";  
                 } else if (refName === 'UETR') {
-                    refValue.placeholder = "Enter UETR (UUID format)";
+                    refValue.placeholder = "Enter UETR";
                     refValue.pattern = "[a-fA-F0-9\\-]{36}";  
                 } else {
                     refValue.placeholder = "Enter value";
@@ -110,10 +110,10 @@
                     </div>
                     <div class="row align-content-center justify-content-center flex-column flex-sm-row">
                         <div class="col-4 mb-3">
-                            <label for="referenceName"><strong>Reference name</strong><span class="control-label"></span></label>
+                            <label for="ref_name"><strong>Reference name</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <select class="selecter">
+                            <select class="form-controlselecter" id="ref_name" onchange="updateInputField()">
                                 <option value ="" selected disabled>Choose a reference name</option required>
                                 <option value="F20">F20</option>
                                 <option value="MSGID">MSGID</option>
@@ -134,7 +134,7 @@
                             <label for="date"><strong>Date</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <input type="date" id="date" name="date" class="selecter" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
+                            <input type="date" id="date" name="date" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
                     <div class="row align-items-center justify-content-center mx-auto mt-3" id="button-container">
