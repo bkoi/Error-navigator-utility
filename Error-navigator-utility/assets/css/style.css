@@ -56,8 +56,13 @@ body {
 
 .selecter {
     border-radius: 5px;
+    height: 2rem;
+    padding: 6px, 12px;
 }
 
+.form-control {
+    height: 2rem;  
+}
 .control-label:after {
     content: " *";
     color: #ff0000;

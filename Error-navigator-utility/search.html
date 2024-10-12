@@ -12,6 +12,25 @@
         <title>Error Navigator Search</title>
         <!-- Script for logout and close connection-->
         <script>
+            function updateInputField() {
+                const refName = document.getElementById('ref_name').value;
+                const refValue = document.getElementById('ref_value');
+
+                if (refName === 'F20') {
+                    refValue.placeholder = "Enter F20 (16 characters)";
+                    refValue.pattern = "[A-Za-z0-9]{16}"; 
+                } else if (refName === 'MSGID') {
+                    refValue.placeholder = "Enter MSGID (e.g., E103240906170945)";
+                    refValue.pattern = "[A-Za-z0-9]{15,50}";  
+                } else if (refName === 'UETR') {
+                    refValue.placeholder = "Enter UETR (UUID format)";
+                    refValue.pattern = "[a-fA-F0-9\\-]{36}";  
+                } else {
+                    refValue.placeholder = "Enter value";
+                    refValue.pattern = "";  
+                }
+            };
+
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'
@@ -84,27 +103,35 @@
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
                             <select class="selecter">
-                                <option selected>Choose an environment</option required>
+                                <option value ="" selected disabled>Choose an environment</option required>
                                 <option value="SIT2">SIT2</option>
-                            </select>>
+                            </select>
                         </div>
                     </div>
                     <div class="row align-content-center justify-content-center flex-column flex-sm-row">
                         <div class="col-4 mb-3">
-                            <label for="referenceName"><strong>ref_name</strong><span class="control-label"></span></label>
+                            <label for="referenceName"><strong>Reference name</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
                             <select class="selecter">
-                                <option selected>Choose a ref_name</option required>
+                                <option value ="" selected disabled>Choose a reference name</option required>
                                 <option value="F20">F20</option>
                                 <option value="MSGID">MSGID</option>
                                 <option value="UETR">UETR</option>
-                            </select>>
+                            </select>
                         </div>
                     </div>
                     <div class="row align-content-center justify-content-center flex-column flex-sm-row">
                         <div class="col-4 mb-3">
-                            <label for="date"><strong>date</strong><span class="control-label"></span></label>
+                            <label for="ref_value"><strong>Enter Value</strong><span class="control-label"></span></label>
+                        </div>
+                        <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
+                            <input type="text" id="ref_value" name="ref_value" class="form-control" placeholder="Enter F20, MSGID, or UETR" required>
+                        </div>
+                    </div>
+                    <div class="row align-content-center justify-content-center flex-column flex-sm-row">
+                        <div class="col-4 mb-3">
+                            <label for="date"><strong>Date</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
                             <input type="date" id="date" name="date" class="selecter" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>

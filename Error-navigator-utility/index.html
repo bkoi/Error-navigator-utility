@@ -53,6 +53,7 @@
                 if (!validateStaffid(staffid)) {
                     staffidError.textContent = 'Staff ID must be 8 digits long';
                     valid = false;
+                    console.log(staffidError);
                 } else {
                     staffidError.textContent = '';
                 }
@@ -60,6 +61,7 @@
                 if (!validatePassword(password)) {
                     passwordError.textContent = 'Password must be at least 12 characters long, containing letters, numbers,and at least one special character.';
                     valid = false;
+                    console.log(passwordError);
                 } else {
                     passwordError.textContent = '';
                 }
