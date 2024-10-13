@@ -30,6 +30,9 @@ app.use('/auth', authRoutes);
 //app.use(userRoutes);
 //app.use(transactionsRoutes);
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 connectDB();
 
 //Function to gracefully shutdown the database connection
@@ -68,15 +71,15 @@ process.on('exit', (code) => {
 });
 
 app.get('/index', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'views/index.html'));
 });
 
 app.get('/search', (req, res) => {
-    res.sendFile(path.join(__dirname, 'search.html'));
+    res.sendFile(path.join(__dirname, 'views/search.html'));
 });
 
 app.get('/result', (req, res) => {
-    res.sendFile(path.join(__dirname, 'result.html'));
+    res.sendFile(path.join(__dirname, 'views/result.html'));
 });
 
 app.post('/login-form', async (req, res, next) => {
@@ -186,7 +189,7 @@ app.get('/transactions', async (req, res) => {
         const [results] = await pool.query(sql, [ref_value, createddate]);
 
         if (results.length > 0) {
-            res.send(results);
+            res.render('result', { transactions: results });
         } else {
             res.status(404).send('Transaction not found');
         }
