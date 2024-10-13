@@ -114,12 +114,12 @@ app.post('/login-form', async (req, res, next) => {
             if (loginResponse.statusCode === 302) {
                 const location = loginResponse.headers.location;
                 console.log('Redirected to:', location);
-                res.redirect(location );
+                res.redirect(location);
             } else if(loginResponse.statusCode === 200) {
 
                 try {
                     const pool = await connectDB();
-                    const query = 'SELECT role FROM users WHERE staffid = ?';
+                    const query = `SELECT role FROM users WHERE staffid = ?`;
                     const [results] = await pool.query(query, [staffid]);
 
                     if (results.length > 0) {
@@ -189,7 +189,8 @@ app.get('/transactions', async (req, res) => {
         const [results] = await pool.query(sql, [ref_value, createddate]);
 
         if (results.length > 0) {
-            res.render('result', { transactions: results });
+            const isAdmin = req.session.user && req.session.user.role === 'admin';
+            res.render('result', { transactions: results, isAdmin: isAdmin });
         } else {
             res.status(404).send('Transaction not found');
         }
@@ -198,5 +199,45 @@ app.get('/transactions', async (req, res) => {
         res.status(500).send('Error retrieving transaction');
     }
 });
+
+app.post('/transactions/update', async (req, res) => {
+    const { ref_name, ref_value, createddate, event_desc, root_cause } = req.body;
+
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).send('Unauthorized action. Only admin users can update.');
+    }
+
+    if (!ref_name || !ref_value || !createddate || !event_desc || !root_cause) {
+        return res.status(400).send('All fields are required for update.');
+    }
+
+    let column;
+    if (ref_name === 'MSGID') {
+        column = 'messageid';
+    } else if (ref_name === 'F20') {
+        column = 'F20';
+    } else if (ref_name === 'UETR') {
+        column = 'UETR';
+    } else {
+        return res.status(400).send('Invalid reference name.');
+    }
+
+    try {
+        const pool = await connectDB();
+        const updateSql = `UPDATE transactions SET event_desc = ?, root_cause = ? WHERE ${column} = ? AND DATE(createddate) = ?`;
+        const [results] = await pool.query(updateSql, [event_desc, root_cause, ref_value, createddate]);
+
+        if (results.affectedRows > 0) {
+            const [updatedTransaction] = await pool.query(`SELECT * FROM transactions WHERE ${column} = ? AND DATE(createddate) = ?`, [ref_value, createddate]);
+            res.render('result', { transactions: updatedTransaction, isAdmin: true });
+        } else {
+            res.status(404).send('Transaction not found or no changes made.');
+        }
+    } catch (error) {
+        console.error('Error updating transaction:', error);
+        res.status(500).send('Error updating transaction.');
+    }
+});
+
 
 const server = app.listen(port, () => console.log(`Server connected to port ${port}`));

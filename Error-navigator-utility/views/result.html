@@ -11,9 +11,20 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <title>Error Navigator Search Result</title>
         <script>
-            function navigateToSearch(event) {
+            /*function navigateToSearch(event) {
                 window.location.href ='/search';   
-            };
+            };*/
+            /*function goBackToSearch() {
+                const refName = '<%= transactions[0].messageid ? "MSGID" : "F20" %>';
+                const refValue = '<%= transactions[0].messageid || transactions[0].F20 %>';
+                const createdDate = '<%= new Date(transactions[0].createddate).toISOString().split("T")[0] %>';
+
+                // Construct the URL with query parameters
+                const url = `/search?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`;
+                
+                // Redirect the browser to the search page with query parameters
+                window.location.href = url;
+            };*/
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'
@@ -74,14 +85,18 @@
              <section class="d-flex align-items-center justify-content-center">
                  <div class="row align-items-center justify-content-center mt-5" id="result-area">
                      <div class="col-10 col-sm-8 d-flex">
-                         <div id="result"></div>
+                         <div id="result">
+                            <% if (isAdmin) { %>
+                                <button onclick="showUpdateForm()">Update</button>
+                            <% } %>                            
+                         </div>
                     </div>
                 </div>
             </section>
             <section>
                 <div class="row align-items-center justify-content-center mt-5">
                     <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                        <button type="button" class="btn submit-btn" onclick="navigateToSearch(this)">Search</button>
+                        <button type="button" class="btn submit-btn" onclick="goBackToSearch(this)">Back to Search</button>
                     </div>
                     <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
                         <button type="button" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
@@ -97,6 +112,19 @@
                 </div>
             </div>
         </footer>
+        <script>
+            function goBackToSearch() {
+                const refName = '<%= transactions[0].messageid ? "MSGID" : "F20" %>';
+                const refValue = '<%= transactions[0].messageid || transactions[0].F20 %>';
+                const createdDate = '<%= new Date(transactions[0].createddate).toISOString().split("T")[0] %>';  // Format as YYYY-MM-DD
+
+                // Construct the URL with query parameters
+                const url = `/search?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`;
+                
+                // Redirect the browser to the search page with query parameters
+                window.location.href = url;
+            };
+        </script>
     </body>
 </html>
 

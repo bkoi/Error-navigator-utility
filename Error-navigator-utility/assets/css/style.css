@@ -86,6 +86,10 @@ body {
     grid-template-columns: repeat(4, 0fr);
 }
 
+#update-fields {
+    display: none;
+}
+
 #result {
     border-width: 5px;
     border-style: ridge;
