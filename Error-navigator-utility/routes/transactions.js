@@ -1,14 +1,14 @@
 const express = require('express');
 //const cors = require('cors');
-const mysqlConnection = require('../utils/database');
-
+const connectDB = require('../utils/database');
 const router = express.Router();
 
 //View transactions
-router.get('/transactions', (req, res) => {
+/*router.get('/transactions', async (req, res) => {
     const sql = 'SELECT * FROM transactions';
+    const pool = await connectDB();
 
-    mysqlConnection.query(sql, (err, results, fields) => {
+    pool.query(sql, (err, results, fields) => {
         if (!err) {
             res.send(results);
         } else {
@@ -16,13 +16,15 @@ router.get('/transactions', (req, res) => {
         }
     });
 });
+*/
 
 //View single transaction
-router.get('/transactions/:messageid', (req, res) => {
+router.get('/transactions/:messageid', async (req, res) => {
     const { messageid } = req.params;
     const sql = 'SELECT * FROM transactions WHERE messageid = ?';
+    const pool = await connectDB();
 
-    mysqlConnection.query(sql, messageid, (err, results, fields) => {
+    pool.query(sql, messageid, (err, results, fields) => {
         if (!err) {
             if (results.length > 0) {
                 res.send(results);
@@ -37,12 +39,13 @@ router.get('/transactions/:messageid', (req, res) => {
  });
 
 //Update transaction
-router.put('/transactions/:messageid', (req, res) => {
+router.put('/transactions/:messageid', async(req, res) => {
     const { messageid } = req.params;
     const { UETR, F20, createddate, event_desc, root_cause, staffid } = req.body;
     const sql = 'UPDATE transactions SET UETR = ?, F20 = ?, createddate = ?, event_desc = ?, root_cause = ?, staffid = ? WHERE messageid = ?';
+    const pool = await connectDB();
 
-    mysqlConnection.query(sql, [UETR, F20, createddate, event_desc, root_cause, staffid, messageid], (err, results, fields) => {
+    pool.query(sql, [UETR, F20, createddate, event_desc, root_cause, staffid, messageid], (err, results, fields) => {
         if (!err) {
             if (results.affectedRows > 0) {
                 res.send("The data for the selected transaction has been successfully updated");
@@ -57,11 +60,12 @@ router.put('/transactions/:messageid', (req, res) => {
 });
 
 //Delete transaction
-router.delete('/transactions/:messageid', (req, res) => {
+router.delete('/transactions/:messageid', async(req, res) => {
     const { messageid } = req.params;
     const sql = 'DELETE FROM transactions WHERE messageid = ?';
+    const pool = await connectDB();
 
-    mysqlConnection.query(sql, messageid, (err, results, fields) => {
+    pool.query(sql, messageid, (err, results, fields) => {
         if (!err) {
             res.send("The selected transaction has been deleted");
         } else {

@@ -79,7 +79,7 @@ app.get('/result', (req, res) => {
     res.sendFile(path.join(__dirname, 'result.html'));
 });
 
-app.post('/login-form', (req, res, next) => {
+app.post('/login-form', async (req, res, next) => {
     const { staffid, password } = req.body;
 
     if(!staffid || !password) {
@@ -105,20 +105,41 @@ app.post('/login-form', (req, res, next) => {
             data += chunk;
         });
 
-        loginResponse.on('end', () => {
+        loginResponse.on('end', async () => {
             console.log('Response from /auth/login:', loginResponse.statusCode, data);
 
             if (loginResponse.statusCode === 302) {
                 const location = loginResponse.headers.location;
                 console.log('Redirected to:', location);
-                res.redirect(location);
+                res.redirect(location );
             } else if(loginResponse.statusCode === 200) {
-                res.redirect('/search');
+
+                try {
+                    const pool = await connectDB();
+                    const query = 'SELECT role FROM users WHERE staffid = ?';
+                    const [results] = await pool.query(query, [staffid]);
+
+                    if (results.length > 0) {
+                        const userRole = results[0].role;
+
+                        // Store user role in session
+                        req.session.user = { staffid, role: userRole };
+
+                        // Redirect to search page after login
+                        res.redirect('/search');
+                    } else {
+                        res.status(404).send('User role not found');
+                    }
+                } catch (error) {
+                    console.error('Error retrieving user role:', error);
+                    res.status(500).send('Internal server error');
+                }
             } else {
                 res.status(401).send('Login failed.');
-            }   
-        }); 
-    }); 
+            }
+        });
+    });
+
 
     loginRequest.on('error', (error) => {
         console.error('Error forwarding request:', error);
@@ -126,6 +147,53 @@ app.post('/login-form', (req, res, next) => {
     });
 
     loginRequest.end(); 
+});
+
+app.get('/search', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/index');
+    }
+
+    const userRole = req.session.user.role;
+    res.render('search', { role: userRole });
+});
+
+app.get('/transactions', async (req, res) => {
+    const { ref_name, ref_value, createddate } = req.query;
+
+    if (!ref_name || !ref_value || !createddate) {
+        return res.status(400).send('Reference name, value, and createddate are required.');
+    }
+
+    let column;
+    if (ref_name === 'MSGID') {
+        column = 'messageid';
+    } else if (ref_name === 'F20') {
+        column = 'F20';
+    } else if (ref_name === 'UETR') {
+        column = 'UETR';
+    } else {
+        return res.status(400).send('Invalid reference name.');
+    }
+
+    try {
+        const pool = await connectDB();
+        const sql = `SELECT * FROM transactions WHERE ${column} = ? AND DATE(createddate) = ?`;
+
+        console.log(`Executing query: ${sql}`);
+        console.log(`ref_value: ${ref_value}, createddate:${createddate}`);
+
+        const [results] = await pool.query(sql, [ref_value, createddate]);
+
+        if (results.length > 0) {
+            res.send(results);
+        } else {
+            res.status(404).send('Transaction not found');
+        }
+    } catch (error) {
+        console.error('Error retrieving transaction:', error);
+        res.status(500).send('Error retrieving transaction');
+    }
 });
 
 const server = app.listen(port, () => console.log(`Server connected to port ${port}`));

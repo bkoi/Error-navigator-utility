@@ -89,7 +89,7 @@
                 </div>
             </section>
             <section>
-                <form>
+                <form action="/transactions" method="GET">
                     <div class="row align-content-center justify-content-center flex-column flex-sm-row">
                         <div class="col-6 col-sm-4 mb-2">
                             <label for="parameterName"><h5><strong>Parameter Name</strong></h5></label>
@@ -113,8 +113,8 @@
                             <label for="ref_name"><strong>Reference name</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <select class="form-controlselecter" id="ref_name" onchange="updateInputField()">
-                                <option value ="" selected disabled>Choose a reference name</option required>
+                            <select class="form-controlselecter" id="ref_name" name="ref_name" onchange="updateInputField()" required>
+                                <option value ="" selected disabled>Choose a reference name</option>
                                 <option value="F20">F20</option>
                                 <option value="MSGID">MSGID</option>
                                 <option value="UETR">UETR</option>
@@ -134,21 +134,21 @@
                             <label for="date"><strong>Date</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <input type="date" id="date" name="date" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
+                            <input type="date" id="date" name="createddate" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
                     <div class="row align-items-center justify-content-center mx-auto mt-3" id="button-container">
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="button" class="btn submit-btn">Search</button>
+                            <button type="submit" class="btn submit-btn">Search</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="button" class="btn submit-btn">Update</button>
+                            <button type="submit" class="btn submit-btn">Update</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="button" class="btn submit-btn">Delete</button>
+                            <button type="submit" class="btn submit-btn">Delete</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="button" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
+                            <button type="submit" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
                         </div>
                     </div>
                 </form>
