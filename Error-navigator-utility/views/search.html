@@ -30,29 +30,6 @@
                     refValue.pattern = "";  
                 }
             };
-            // Show the update fields if query parameters exist (for update mode)
-            document.addEventListener('DOMContentLoaded', function() {
-                const queryParams = new URLSearchParams(window.location.search);
-                const refName = queryParams.get('ref_name');
-                const refValue = queryParams.get('ref_value');
-                const createdDate = queryParams.get('createddate');
-
-                if (refName) {
-                    document.getElementById('ref_name').value = refName;
-                }
-                if (refValue) {
-                    document.getElementById('ref_value').value = refValue;
-                }
-                if (createdDate) {
-                    document.getElementById('date').value = createdDate;
-                }
-
-                // Optionally, display the update fields if in update mode
-                if (refName && refValue && createdDate) {
-                    document.getElementById('update-fields').style.display = 'block';
-                }
-            });
-            
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'
@@ -159,9 +136,12 @@
                             <input type="date" id="date" name="createddate" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
-                    <div class="row align-items-center justify-content-center mx-auto mt-3" id="button-container">
+                    <div class="row align-items-center justify-content-center mx-auto mt-3" id="action-buttons">
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="submit" class="btn submit-btn">Search</button>
+                            <button type="submit" class="btn submit-btn ">Search</button>
+                        </div>
+                        <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
+                            <button type="submit" class="btn submit-btn">Update</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
                             <button type="submit" class="btn submit-btn">Delete</button>
@@ -171,36 +151,44 @@
                         </div>
                     </div>
                 </form>
-                <!--Update section for admins-->
+            </section>
+            <!-- Update Section for Admin (Hidden Initially) -->
+            <section id="update-fields">
                 <form action="/transactions/update" method="POST">
                     <input type="hidden" name="ref_name" value="<%= ref_name %>">
                     <input type="hidden" name="ref_value" value="<%= ref_value %>">
                     <input type="hidden" name="createddate" value="<%= createddate %>">
-                    <!-- Display update fields if in update mode -->
-                    <div id="update-fields">
-                        <div class="row align-content-center justify-content-center flex-column flex-sm-row">
-                            <div class="col-4 mb-3">
-                                <label for="event_desc"><strong>New Event Description</strong></label>
-                            </div>
-                            <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                                <input type="text" id="event_desc" name="event_desc" class="form-control" placeholder="Enter new event description">
-                            </div>
+
+                    <div class="row align-content-center justify-content-center flex-column flex-sm-row">
+                        <div class="col-4 mb-3">
+                            <label for="event_desc"><strong>New Event Description</strong></label>
                         </div>
-                        <div class="row align-content-center justify-content-center flex-column flex-sm-row">
-                            <div class="col-4 mb-3">
-                                <label for="root_cause"><strong>New Root Cause</strong></label>
-                            </div>
-                            <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                                <input type="text" id="root_cause" name="root_cause" class="form-control" placeholder="Enter new root cause">
-                            </div>
-                        </div>
-                        <!-- Submit Update Button -->
-                        <div class="row align-items-center justify-content-center mx-auto mt-3">
-                            <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                                <button type="submit" class="btn submit-btn">Update</button>
-                            </div>
+                        <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
+                            <input type="text" id="event_desc" name="event_desc" class="form-control" placeholder="Enter new event description">
                         </div>
                     </div>
+                    <div class="row align-content-center justify-content-center flex-column flex-sm-row">
+                        <div class="col-4 mb-3">
+                            <label for="root_cause"><strong>New Root Cause</strong></label>
+                        </div>
+                        <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
+                            <input type="text" id="root_cause" name="root_cause" class="form-control" placeholder="Enter new root cause">
+                        </div>
+                    </div>
+                    <div class="row align-items-center justify-content-center mx-auto mt-3" id="update-buttons">
+                        <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
+                            <button type="submit" class="btn submit-btn ">Search</button>
+                        </div>
+                        <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
+                            <button type="submit" class="btn submit-btn">Update</button>
+                        </div>
+                        <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
+                            <button type="submit" class="btn submit-btn">Delete</button>
+                        </div>
+                        <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
+                            <button type="submit" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
+                        </div>
+                    </div>  
                 </form>
             </section>
         </div>  
@@ -212,5 +200,26 @@
                 </div>
             </div>
         </footer>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const isAdmin = '<%= isAdmin %>';
+                const queryParams = new URLSearchParams(window.location.search);
+                const refName = queryParams.get('ref_name');
+                const refValue = queryParams.get('ref_value');
+                const createdDate = queryParams.get('createddate');
+
+                if (refName && refValue && createdDate) {
+                    document.getElementById('update-fields').style.display = 'none';
+                    document.getElementById('action-buttons').style.display = 'inline';
+                    document.getElementById('update-buttons').style.display = 'none';
+                }
+
+                if (isAdmin && refName && refValue && createdDate) {
+                    document.getElementById('update-fields').style.display = 'grid';
+                    document.getElementById('action-buttons').style.display = 'none';
+                    document.getElementById('update-buttons').style.display = 'grid';
+                }
+            });
+        </script>
     </body>
 </html>

@@ -81,13 +81,18 @@ body {
     background-color: #8a1c69;
 }
 
-#button-container {
+#action-buttons {
     display: grid;
     grid-template-columns: repeat(4, 0fr);
 }
 
 #update-fields {
     display: none;
+}
+
+#update-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 0fr);
 }
 
 #result {

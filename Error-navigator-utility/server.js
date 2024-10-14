@@ -158,7 +158,9 @@ app.get('/search', (req, res) => {
     }
 
     const userRole = req.session.user.role;
-    res.render('search', { role: userRole });
+    const isAdmin = userRole === 'admin';
+
+    res.render('search', { isAdmin, role: userRole });
 });
 
 app.get('/transactions', async (req, res) => {
