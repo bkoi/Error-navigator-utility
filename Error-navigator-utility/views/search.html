@@ -88,7 +88,7 @@
                 </div>
             </section>
             <section>
-                <form action="/transactions" method="GET">
+                <form>
                     <div class="row align-content-center justify-content-center flex-column flex-sm-row">
                         <div class="col-6 col-sm-4 mb-2">
                             <label for="parameterName"><h5><strong>Parameter Name</strong></h5></label>
@@ -101,10 +101,11 @@
                             <label for="e2eEnvironment"><strong>E2Env</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <select class="selecter">
+                            <!--<select class="selecter">
                                 <option value ="" selected disabled>Choose an environment</option required>
                                 <option value="SIT2">SIT2</option>
-                            </select>
+                            </select>-->
+                            <input type="text" id="e2eEnvironment" name="e2eEnvironment"class="form-control" value="SIT2">
                         </div>
                     </div>
                     <div class="row align-content-center justify-content-center flex-column flex-sm-row">
@@ -113,7 +114,7 @@
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
                             <select class="form-control selecter" id="ref_name" name="ref_name" onchange="updateInputField()" required>
-                                <option value ="" selected disabled>Choose a reference name</option>
+                                <option value ="" disabled selected>Choose a reference name</option>
                                 <option value="F20">F20</option>
                                 <option value="MSGID">MSGID</option>
                                 <option value="UETR">UETR</option>
@@ -133,28 +134,28 @@
                             <label for="date"><strong>Date</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <input type="date" id="date" name="createddate" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
+                            <input type="date" id="createddate" name="createddate" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
                     <div class="row align-items-center justify-content-center mx-auto mt-3" id="action-buttons">
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="submit" class="btn submit-btn ">Search</button>
+                            <button type="button" class="btn submit-btn" onclick="performSearch(event)">Search</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="submit" class="btn submit-btn">Update</button>
+                            <button type="button" class="btn submit-btn" onclick="performUpdate()">Update</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="submit" class="btn submit-btn">Delete</button>
+                            <button type="button" class="btn submit-btn" onclick="performDelete()">Delete</button>
                         </div>
                         <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                            <button type="submit" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
+                            <button type="button" class="btn submit-btn" onclick="navigateToLogOut()">Logout</button>
                         </div>
                     </div>
                 </form>
             </section>
             <!-- Update Section for Admin (Hidden Initially) -->
             <section id="update-fields">
-                <form action="/transactions/update" method="POST">
+                <form>
                     <input type="hidden" name="ref_name" value="<%= ref_name %>">
                     <input type="hidden" name="ref_value" value="<%= ref_value %>">
                     <input type="hidden" name="createddate" value="<%= createddate %>">
@@ -201,24 +202,146 @@
             </div>
         </footer>
         <script>
+            // Function to perform Search
+            function performSearch(event) {
+                event.preventDefault();
+
+                const refName = document.getElementById('ref_name').value;
+                const refValue = document.getElementById('ref_value').value;
+                const createdDate = document.getElementById('createddate').value;
+                const accessToken = localStorage.getItem('accessToken'); // Retrieve JWT token
+                console.log(accessToken);
+
+                fetch(`/transactions?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+                .then(response => {
+                    if (response.status === 403) {
+                        // Token expired or invalid, attempt to refresh the token
+                        return refreshAccessToken().then(newAccessToken => {
+                            // Retry the request with the new access token
+                            return fetch(`/transactions?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${newAccessToken}`
+                                }
+                            });
+                        });
+                    }
+                    return response;
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Search result:', data);
+
+                    if (data.length > 0) {
+                        localStorage.setItem('searchResults', JSON.stringify(data));
+                        window.location.href = '/result';
+                    } else {
+                        alert('No results found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during search:', error);
+                });
+            };
+
+            // Function to refresh the access token
+            function refreshAccessToken() {
+                const refreshToken = localStorage.getItem('refreshToken'); // Retrieve the refresh token
+
+                return fetch('/auth/refresh-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-refresh-token': refreshToken
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to refresh access token');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const newAccessToken = data.accessToken;
+                    localStorage.setItem('accessToken', newAccessToken); // Store the new token
+                    return newAccessToken;
+                });
+            };
+
+            // Function to perform Delete
+            function performDelete(event) {
+                const refName = document.getElementById('ref_name').value;
+                const refValue = document.getElementById('ref_value').value;
+                const createdDate = document.getElementById('date').value;
+                const accessToken = localStorage.getItem('accessToken'); // Retrieve JWT token
+                console.log(accessToken);
+
+                fetch(`/transactions/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ ref_name: refName, ref_value: refValue, createddate: createdDate })
+                }).then(response => response.json())
+                .then(data => {
+                    console.log('Delete result:', data);
+                }).catch(error => {
+                    console.error('Error during delete:', error);
+                });
+            }
+
+            // Function to perform Update
+            function performUpdate(event) {
+                const refName = document.getElementById('ref_name').value;
+                const refValue = document.getElementById('ref_value').value;
+                const createdDate = document.getElementById('date').value;
+                const eventDesc = document.getElementById('event_desc').value;
+                const rootCause = document.getElementById('root_cause').value;
+                const accessToken = localStorage.getItem('accessToken'); // Retrieve JWT token
+
+                fetch(`/transactions/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ ref_name: refName, ref_value: refValue, createddate: createdDate, event_desc: eventDesc, root_cause: rootCause })
+                }).then(response => response.json())
+                .then(data => {
+                    console.log('Update result:', data);
+                }).catch(error => {
+                    console.error('Error during update:', error);
+                });
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
-                const isAdmin = '<%= isAdmin %>';
                 const queryParams = new URLSearchParams(window.location.search);
                 const refName = queryParams.get('ref_name');
                 const refValue = queryParams.get('ref_value');
                 const createdDate = queryParams.get('createddate');
 
-                if (refName && refValue && createdDate) {
-                    document.getElementById('update-fields').style.display = 'none';
-                    document.getElementById('action-buttons').style.display = 'inline';
-                    document.getElementById('update-buttons').style.display = 'none';
+                if (refName) {
+                    document.getElementById('ref_name').value = refName;
+                }
+                if (refValue) {
+                    document.getElementById('ref_value').value = refValue;
+                }
+                if (createdDate) {
+                    document.getElementById('date').value = createdDate;
                 }
 
+                const isAdmin = localStorage.getItem('role') === 'admin';
                 if (isAdmin && refName && refValue && createdDate) {
                     document.getElementById('update-fields').style.display = 'grid';
                     document.getElementById('action-buttons').style.display = 'none';
                     document.getElementById('update-buttons').style.display = 'grid';
-                }
+                    } 
             });
         </script>
     </body>

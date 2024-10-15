@@ -11,6 +11,7 @@ const session = require('express-session');
 const crypto = require('crypto');
 //const sessionSecret = crypto.randomBytes(32).toString('hex');
 const http = require('http');
+const { authenticateAccessToken } = require('./authentication/auth');
 const port = process.env.PORT;
 
 const app = express();
@@ -23,7 +24,14 @@ app.use(session({
 }));
 
 app.use(express.static(path.join(__dirname, 'assets')));
-app.use(cors());
+
+const corsOptions = {
+    origin: 'http://localhost:8000/index',  // Replace with your front-end origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true  // Allow cookies and credentials
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 app.use('/auth', authRoutes);
@@ -80,6 +88,16 @@ app.get('/search', (req, res) => {
 
 app.get('/result', (req, res) => {
     res.sendFile(path.join(__dirname, 'views/result.html'));
+});
+
+app.get('/search', authenticateAccessToken, (req, res) => {
+    if (!req.user) {
+        return res.redirect('/index');
+    }
+
+    const userRole = req.user.role;
+    const isAdmin = userRole === 'admin';
+    res.render('search', { isAdmin, role: userRole });
 });
 
 app.post('/login-form', async (req, res, next) => {
@@ -152,22 +170,28 @@ app.post('/login-form', async (req, res, next) => {
     loginRequest.end(); 
 });
 
-app.get('/search', (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/index');
-    }
+app.post('/refresh-token', (req, res) => {
+    const refreshToken = req.headers['x-refresh-token'];
 
-    const userRole = req.session.user.role;
-    const isAdmin = userRole === 'admin';
+    if (!refreshToken) return res.sendStatus(401); // Unauthorized
 
-    res.render('search', { isAdmin, role: userRole });
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, user) => {
+        if (error) return res.sendStatus(403); // Forbidden
+
+        // Generate a new access token
+        const newAccessToken = generateAccessToken({ staffid: user.staffid, role: user.role });
+        res.json({ accessToken: newAccessToken });
+    });
 });
 
-app.get('/transactions', async (req, res) => {
+app.get('/transactions', authenticateAccessToken, async (req, res) => {
+    console.log('Received search request'); 
+    console.log('User:', req.user);
+
     const { ref_name, ref_value, createddate } = req.query;
 
     if (!ref_name || !ref_value || !createddate) {
-        return res.status(400).send('Reference name, value, and createddate are required.');
+        return res.status(400).json({ error: 'Missing required parameters.'});
     }
 
     let column;
@@ -178,7 +202,7 @@ app.get('/transactions', async (req, res) => {
     } else if (ref_name === 'UETR') {
         column = 'UETR';
     } else {
-        return res.status(400).send('Invalid reference name.');
+        return res.status(400).json({ error: 'Invalid reference name.'  });
     }
 
     try {
@@ -191,22 +215,21 @@ app.get('/transactions', async (req, res) => {
         const [results] = await pool.query(sql, [ref_value, createddate]);
 
         if (results.length > 0) {
-            const isAdmin = req.session.user && req.session.user.role === 'admin';
-            res.render('result', { transactions: results, isAdmin: isAdmin });
+            res.json(results);
         } else {
-            res.status(404).send('Transaction not found');
+            res.status(404).json({ error: 'Transaction not found' });
         }
     } catch (error) {
         console.error('Error retrieving transaction:', error);
-        res.status(500).send('Error retrieving transaction');
+        res.status(500).json({ error: 'Error retrieving transaction' });
     }
 });
 
-app.post('/transactions/update', async (req, res) => {
+app.post('/transactions/update', authenticateAccessToken, async (req, res) => {
     const { ref_name, ref_value, createddate, event_desc, root_cause } = req.body;
 
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).send('Unauthorized action. Only admin users can update.');
+    if (req.user.role !== 'admin') {
+        return res.status(403).send('Unauthorized action. Only admin users can update transactions.');
     }
 
     if (!ref_name || !ref_value || !createddate || !event_desc || !root_cause) {
@@ -231,7 +254,7 @@ app.post('/transactions/update', async (req, res) => {
 
         if (results.affectedRows > 0) {
             const [updatedTransaction] = await pool.query(`SELECT * FROM transactions WHERE ${column} = ? AND DATE(createddate) = ?`, [ref_value, createddate]);
-            res.render('result', { transactions: updatedTransaction, isAdmin: true });
+            res.render('result', { transactions: updatedTransaction, isAdmin: true, successMessage: 'Transaction updated successfully.' });
         } else {
             res.status(404).send('Transaction not found or no changes made.');
         }
@@ -241,5 +264,11 @@ app.post('/transactions/update', async (req, res) => {
     }
 });
 
+app.delete('/transactions/delete', authenticateAccessToken, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Unauthorized action. Only admin users can delete transactions.' });
+    }
+    // Delete logic here
+});
 
 const server = app.listen(port, () => console.log(`Server connected to port ${port}`));

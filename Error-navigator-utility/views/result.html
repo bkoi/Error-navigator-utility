@@ -79,6 +79,13 @@
                  <div class="row align-items-center justify-content-center">
                      <div class="col-10 col-sm-8 mb-3">
                          <h1 class="text-center">Search Result</h1>
+
+                         <% if (successMessage) { %>
+                            <div class="alert alert-success">
+                                <%= successMessage %>
+                            </div>
+                        <% } %>
+                
                      </div>
                  </div>
              </section>
@@ -86,9 +93,9 @@
                  <div class="row align-items-center justify-content-center mt-5" id="result-area">
                      <div class="col-10 col-sm-8 d-flex">
                          <div id="result">
-                            <% if (isAdmin) { %>
+                            <!--<% if (isAdmin) { %>
                                 <button onclick="showUpdateForm()">Update</button>
-                            <% } %>                            
+                            <% } %> -->                          
                          </div>
                     </div>
                 </div>
@@ -113,15 +120,36 @@
             </div>
         </footer>
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const results = JSON.parse(localStorage.getItem('searchResults'));
+
+                if (results && results.length > 0) {
+                    const resultContainer = document.getElementById('result-area');
+                    resultContainer.innerHTML = ''; // Clear any previous results
+
+                    results.forEach(result => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+                        resultItem.innerHTML = `
+                            <p><strong>Reference Name:</strong> ${result.ref_name}</p>
+                            <p><strong>Reference Value:</strong> ${result.ref_value}</p>
+                            <p><strong>Date:</strong> ${result.createddate}</p>
+                            <p><strong>Event Description:</strong> ${result.event_desc}</p>
+                            <p><strong>Root Cause:</strong> ${result.root_cause}</p>
+                        `;
+                        resultContainer.appendChild(resultItem);
+                    });
+                } else {
+                    document.getElementById('result-area').innerHTML = '<p>No results found</p>';
+                }
+            });
             function goBackToSearch() {
                 const refName = '<%= transactions[0].messageid ? "MSGID" : "F20" %>';
                 const refValue = '<%= transactions[0].messageid || transactions[0].F20 %>';
-                const createdDate = '<%= new Date(transactions[0].createddate).toISOString().split("T")[0] %>';  // Format as YYYY-MM-DD
+                const createdDate = '<%= new Date(transactions[0].createddate).toISOString().split("T")[0] %>'; 
 
-                // Construct the URL with query parameters
                 const url = `/search?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`;
                 
-                // Redirect the browser to the search page with query parameters
                 window.location.href = url;
             };
         </script>

@@ -30,14 +30,14 @@ const login = async (req, res) => {
         const accessToken = jwt.sign(
             { staffid: existingUser.staffid, role:existingUser.role }, 
             process.env.ACCESS_TOKEN_SECRET, 
-            { expiresIn: '15m' }
+            { expiresIn: '1h' }
         );
 
         //Store JWT in session
         req.session.user ={
             staffid: existingUser.staffid, 
             role: existingUser.role,
-            token: accessToken
+            accessToken: accessToken
         };
         //Redirect based on user role
         if (existingUser.role === 'admin' || existingUser.role) {
@@ -53,21 +53,21 @@ const login = async (req, res) => {
 };
 
 // Middleware to authenticate the token
-const authenticateToken = (req, res, next) => {
+const authenticateAccessToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        return res.status(401); // Unauthorized
+        return res.status(401).json({ error: 'Access token is missing or invalid' }); // Unauthorized
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
         if (error) {
-            return res.status(403); // Forbidden
+            return res.status(403).json({ error: 'Token is invalid or expired' }); // Forbidden
         }
         req.user = user; // Attach user data to request
         next();
     });
 };
 
-module.exports = { login, authenticateToken };
+module.exports = { login, authenticateAccessToken };
