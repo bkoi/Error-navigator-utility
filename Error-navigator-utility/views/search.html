@@ -218,21 +218,6 @@
                         'Authorization': `Bearer ${accessToken}`
                     }
                 })
-                .then(response => {
-                    if (response.status === 403) {
-                        // Token expired or invalid, attempt to refresh the token
-                        return refreshAccessToken().then(newAccessToken => {
-                            // Retry the request with the new access token
-                            return fetch(`/transactions?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`, {
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `Bearer ${newAccessToken}`
-                                }
-                            });
-                        });
-                    }
-                    return response;
-                })
                 .then(response => response.json())
                 .then(data => {
                     console.log('Search result:', data);

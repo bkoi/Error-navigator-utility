@@ -215,7 +215,9 @@ app.get('/transactions', authenticateAccessToken, async (req, res) => {
         const [results] = await pool.query(sql, [ref_value, createddate]);
 
         if (results.length > 0) {
-            res.json(results);
+            res.json(results.map(result => {
+                return { ...result, ref_name, ref_value: result[column] };
+            }));
         } else {
             res.status(404).json({ error: 'Transaction not found' });
         }

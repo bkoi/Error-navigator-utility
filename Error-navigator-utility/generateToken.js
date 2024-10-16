@@ -1,10 +1,7 @@
 const dotenv = require('dotenv');
-dotenv.config()
+dotenv.config();
 
 const jwt = require('jsonwebtoken');
-
-//console.log('SECRET KEY:', process.env.ACCESS_TOKEN_SECRET);
-//console.log('TEST VARIABLE:', process.env.TEST_VARIABLE);
 
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
 const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET;

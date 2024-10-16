@@ -70,6 +70,19 @@
                     }
                     loginAttempts++;
                     setTimeout(() => { loginAttempts = 0; }, lockoutTime);
+
+                    fetch('/auth/login', {
+                        method: 'POST',
+                        headers: { staffid: staffid, password: password },
+                    }).then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        localStorage.setItem('accessToken', data.accessToken);
+                        window.location.href = '/search';
+                    }).catch(error => {
+                        console.error('Error logging in', error);
+                        alert('Error logging in. Please try again.');
+                    });
                     return true; 
                     }
                 return false; 
@@ -134,7 +147,7 @@
             </section>
             <section>
                 <div>
-                    <form id="loginForm" action="/login-form" method="POST" onsubmit="return validateForm()">
+                    <form id="loginForm">
                         <div class="row align-items-center justify-content-center">
                             <div class="col-10 col-sm-8 rounded mb-3">
                                 <label for="staffid" class="form-label control-label"><strong>Staff ID</strong></label>
@@ -150,7 +163,7 @@
                             </div>
                         </div>
                         <div class="col-4 col-sm-2 d-flex align-content-center mx-auto mb-3">
-                            <button type="submit" class="btn submit-btn">Submit</button>
+                            <button type="button" class="btn submit-btn" onclick="validateForm()">Submit</button>
                         </div>
                     </form>
                 </div>
