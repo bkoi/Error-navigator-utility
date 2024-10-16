@@ -101,10 +101,6 @@
                             <label for="e2eEnvironment"><strong>E2Env</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <!--<select class="selecter">
-                                <option value ="" selected disabled>Choose an environment</option required>
-                                <option value="SIT2">SIT2</option>
-                            </select>-->
                             <input type="text" id="e2eEnvironment" name="e2eEnvironment"class="form-control" value="SIT2">
                         </div>
                     </div>
@@ -134,7 +130,7 @@
                             <label for="date"><strong>Date</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <input type="date" id="createddate" name="createddate" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
+                            <input type="date" id="createddate" name="createddate" class="form-control" required>
                         </div>
                     </div>
                     <div class="row align-items-center justify-content-center mx-auto mt-3" id="action-buttons">
@@ -262,7 +258,7 @@
             function performDelete(event) {
                 const refName = document.getElementById('ref_name').value;
                 const refValue = document.getElementById('ref_value').value;
-                const createdDate = document.getElementById('date').value;
+                const createdDate = document.getElementById('createddate').value;
                 const accessToken = localStorage.getItem('accessToken'); // Retrieve JWT token
                 console.log(accessToken);
 
@@ -318,7 +314,7 @@
                     document.getElementById('ref_value').value = refValue;
                 }
                 if (createdDate) {
-                    document.getElementById('date').value = createdDate;
+                    document.getElementById('createddate').value = createdDate;
                 }
 
                 const isAdmin = localStorage.getItem('role') === 'admin';
