@@ -33,15 +33,9 @@ const login = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        //Store JWT in session
-        req.session.user ={
-            staffid: existingUser.staffid, 
-            role: existingUser.role,
-            accessToken: accessToken
-        };
         //Redirect based on user role
         if (existingUser.role === 'admin' || existingUser.role) {
-            return res.redirect('/search');
+            return res.status(200).json({ staffid: existingUser.staffid, role: existingUser.role, accessToken: accessToken });
         } else {
             console.log('Unauthorized role: ' , staffid);
             return res.status(403).send('Your accounr does not have access to this application. Please contact your administrator.');
