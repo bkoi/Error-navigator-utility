@@ -1,70 +1,41 @@
 const express = require('express');
 //const cors = require('cors');
-const mysqlConnection = require('../utils/database');
+const connectDB = require('../utils/database');
 
 const router = express.Router();
 
 //View users
-router.get('/users', (req, res) => {
-    const sql = 'SELECT * FROM users';      
-
-    mysqlConnection.query(sql, (err, results, fields) => {
-        if (!err) {
-            res.send(results);
-        } else {
-            console.log(err);
-        }
-    });
-});
-
-//View single user
-router.get('/users/:staffid', (req, res) => {
-    const { staffid } = req.params;
-    const sql = 'SELECT * FROM users WHERE staffid = ?';
-
-    mysqlConnection.query(sql, staffid, (err, results, fields) => {
-        if (!err) {
-            if (results.length > 0) {
-                res.send(results);
-            } else {
-                res.status(404).send('User not found');
-            }
-        } else {
-            console.log(err);
-            res.status(500).send('Error retrieving user');
-        }
-    });
-});
-
-const getUserByStaffId = (staffid) => {
-    return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM users WHERE staffid = ?';
-
-        mysqlConnection.query(sql, staffid, (err, results) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(results);
-            }
-        });
-    });
-};
-
-router.get('/user/:staffid', async (req, res) => {
-    const { staffid } = req.params;
-
+router.get('/users', async (req, res) => {
+    const sql = 'SELECT * FROM users';  
+    
     try {
-        const user = await getUserByStaffId(staffid);
-        if (results.length > 0) {
-            res.send(results);
-            
-        } else {
-            res.status(404).send('User not found');
-        }
+        const pool = await connectDB();
+        const results = await pool.query(sql);
+        return res.status(200).json(results); 
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error retrieving user');
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'FInternal Server Error' });
     }
 });
 
-module.exports = { router, getUserByStaffId};
+//View single user
+router.get('/users/:staffid', async(req, res) => {
+    const staffid  = req.headers['staffid'];
+    const sql = 'SELECT * FROM users WHERE staffid = ?';
+
+    try {
+        const pool = await connectDB();
+        const results = await pool.query(sql, [staffid]);
+
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {    
+            res.status(404).json({ error:'User not found' });
+        }
+    } catch (error) {
+        console.error('Error retrieving users:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+module.exports = router;
