@@ -219,11 +219,11 @@ app.get('/transactions', authenticateAccessToken, async (req, res) => {
                 return { ...result, ref_name, ref_value: result[column]};
             }));
         } else {
-            res.status(500).json({ error: 'Error retrieving transaction' });
+            res.status(404).json({ error: 'No results found' });
         }
     } catch (error) {
         console.error('Error retrieving transaction:', error);
-        res.status(500).send('Error retrieving transaction');
+        res.status(500).json({ error:'Error retrieving transaction' });
     }
 });
 

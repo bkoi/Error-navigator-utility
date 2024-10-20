@@ -23,7 +23,7 @@ const login = async (req, res) => {
         //Check the password
         const passwordMatch = await bcrypt.compare(password, existingUser.password);
         if (!passwordMatch) {
-            return res.status(401).json({ error: 'Incorrect credentials' });
+            return res.status(401).json({ error: 'Staff Id and password do not match. Please try again' });
         }
 
         //Generate a JWT token with 15-minute expiration

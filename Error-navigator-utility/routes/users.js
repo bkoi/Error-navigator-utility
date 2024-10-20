@@ -14,7 +14,7 @@ router.get('/users', async (req, res) => {
         return res.status(200).json(results); 
     } catch (error) {
         console.error('Error fetching users:', error);
-        res.status(500).json({ error: 'FInternal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 

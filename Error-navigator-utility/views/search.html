@@ -206,7 +206,7 @@
                 const refName = document.getElementById('ref_name').value;
                 const refValue = document.getElementById('ref_value').value;
                 const createdDate = document.getElementById('createddate').value;
-                const accessToken = localStorage.getItem('accessToken'); // Retrieve JWT token
+                const accessToken = localStorage.getItem('accessToken');
                 console.log(accessToken);
 
                 fetch(`/transactions?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`, {
@@ -220,8 +220,8 @@
                     console.log('Search result:', data);
 
                     if (data.length > 0) {
-                        localStorage.setItem('searchResults', JSON.stringify(data));
-                        window.location.href = '/result';
+                        localStorage.setItem('searchResults', JSON.stringify(data));  
+                        window.location.href = '/result'; 
                     } else {
                         alert('No results found.');
                     }
@@ -230,6 +230,8 @@
                     console.error('Error during search:', error);
                 });
             };
+
+            // Function to refresh the access token
             
             // Function to refresh the access token
             function refreshAccessToken() {
@@ -310,20 +312,14 @@
 
                 if (refName) {
                     document.getElementById('ref_name').value = refName;
+                    updateInputField();
                 }
                 if (refValue) {
                     document.getElementById('ref_value').value = refValue;
                 }
                 if (createdDate) {
-                    document.getElementById('date').value = createdDate;
+                    document.getElementById('createddate').value = createdDate;
                 }
-
-                const isAdmin = localStorage.getItem('role') === 'admin';
-                if (isAdmin && refName && refValue && createdDate) {
-                    document.getElementById('update-fields').style.display = 'grid';
-                    document.getElementById('action-buttons').style.display = 'none';
-                    document.getElementById('update-buttons').style.display = 'grid';
-                    } 
             });
         </script>
     </body>

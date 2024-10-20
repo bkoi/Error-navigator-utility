@@ -16,7 +16,7 @@
 
                 if (results && results.length > 0) {
                     const resultContainer = document.getElementById('result-area');
-                    resultContainer.innerHTML = ''; // Clear any previous results
+                    resultContainer.innerHTML = '';
 
                     results.forEach(result => {
                         const resultItem = document.createElement('div');
@@ -34,17 +34,17 @@
                     document.getElementById('result-area').innerHTML = '<p>No results found</p>';
                 }
             });
+    
             function goBackToSearch() {
-                const refName = '<%= transactions[0].messageid ? "MSGID" : "F20" %>';
-                const refValue = '<%= transactions[0].messageid || transactions[0].F20 %>';
-                const createdDate = '<%= new Date(transactions[0].createddate).toISOString().split("T")[0] %>'; 
-                //const createdDate = '<%= transactions[0].createddate.getFullYear() + "-" + ("0" + (transactions[0].createddate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactions[0].createddate.getDate()).slice(-2) %>';
-                //console.log(createdDate);
+                const refName = "<%= transactions[0].messegid ? 'MSGID' : 'F20' %>";
+                const refValue = "<%= transactions[0].messegid || transactions[0].F20 %>";
+                const createdDate = "<%= new Date(transactions[0].createddate).toISOString().split('T')[0] %>";
 
                 const url = `/search?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`;
-                
+
                 window.location.href = url;
             };
+
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'
