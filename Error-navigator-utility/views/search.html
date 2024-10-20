@@ -30,6 +30,7 @@
                     refValue.pattern = "";  
                 }
             };
+
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'
@@ -130,7 +131,7 @@
                             <label for="date"><strong>Date</strong><span class="control-label"></span></label>
                         </div>
                         <div class="col-6 col-sm-4 flex-column flex-sm-row mb-3">
-                            <input type="date" id="createddate" name="createddate" class="form-control" required>
+                            <input type="date" id="createddate" name="createddate" class="form-control" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
                     <div class="row align-items-center justify-content-center mx-auto mt-3" id="action-buttons">
@@ -229,7 +230,7 @@
                     console.error('Error during search:', error);
                 });
             };
-
+            
             // Function to refresh the access token
             function refreshAccessToken() {
                 const refreshToken = localStorage.getItem('refreshToken'); // Retrieve the refresh token
@@ -275,7 +276,7 @@
                 }).catch(error => {
                     console.error('Error during delete:', error);
                 });
-            }
+            };
 
             // Function to perform Update
             function performUpdate(event) {
@@ -299,7 +300,7 @@
                 }).catch(error => {
                     console.error('Error during update:', error);
                 });
-            }
+            };
 
             document.addEventListener('DOMContentLoaded', function() {
                 const queryParams = new URLSearchParams(window.location.search);
@@ -314,7 +315,7 @@
                     document.getElementById('ref_value').value = refValue;
                 }
                 if (createdDate) {
-                    document.getElementById('createddate').value = createdDate;
+                    document.getElementById('date').value = createdDate;
                 }
 
                 const isAdmin = localStorage.getItem('role') === 'admin';

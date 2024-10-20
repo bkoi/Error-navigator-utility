@@ -82,7 +82,6 @@
                                     <li><strong>UETR:</strong> <%= transaction.UETR %></li>
                                     <li><strong>F20:</strong> <%= transaction.F20 %></li>
                                     <li><strong>Created Date:</strong> <%= new Date(transaction.createddate).toLocaleString() %></li>
-                                     <!--<li><strong>Created Date:</strong> <%= transaction.createddate.getFullYear() + "-" + ("0" + (transaction.createddate.getMonth() + 1)).slice(-2) + "-" + ("0" + transaction.createddate.getDate()).slice(-2) %></li>-->
                                     <li><strong>Event Description:</strong> <%= transaction.event_desc %></li>
                                     <li><strong>Root Cause:</strong> <%= transaction.root_cause %></li>
                                     <li hidden><strong>Staff ID:</strong> <%= transaction.staffid %></li>
@@ -97,7 +96,7 @@
                                 <input type="hidden" name="ref_name" value="<%= transactions[0].messageid ? 'MSGID' : 'F20' %>">  <!-- Adjust based on your logic -->
                                 <input type="hidden" name="ref_value" value="<%= transactions[0].messageid || transactions[0].F20 %>">
                                 <input type="hidden" name="createddate" value="<%= transactions[0].createddate %>">
-                                <button type="submit" class="btn submit-btn">Update</button>
+                                <button type="button" class="btn submit-btn">Update</button>
                             </form>
                         <% } %>
                     </div>
@@ -127,7 +126,6 @@
             const refName = '<%= transactions[0].messageid ? "MSGID" : "F20" %>';
             const refValue = '<%= transactions[0].messageid || transactions[0].F20 %>';
             const createdDate = '<%= new Date(transactions[0].createddate).toISOString().split("T")[0] %>';
-            //const createdDate = '<%= transactions[0].createddate.getFullYear() + "-" + ("0" + (transactions[0].createddate.getMonth() + 1)).slice(-2) + "-" + ("0" + transactions[0].createddate.getDate()).slice(-2) %>';
             //console.log(createdDate);
 
             // Construct the URL with query parameters

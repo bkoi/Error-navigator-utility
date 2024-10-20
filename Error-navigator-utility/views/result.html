@@ -34,7 +34,6 @@
                     document.getElementById('result-area').innerHTML = '<p>No results found</p>';
                 }
             });
-
             function goBackToSearch() {
                 const refName = '<%= transactions[0].messageid ? "MSGID" : "F20" %>';
                 const refValue = '<%= transactions[0].messageid || transactions[0].F20 %>';
@@ -46,7 +45,6 @@
                 
                 window.location.href = url;
             };
-
             function navigateToLogOut(event) {
             fetch('close-connection', { 
                 method: 'POST'

@@ -90,16 +90,6 @@ app.get('/result', (req, res) => {
     res.sendFile(path.join(__dirname, 'views/result.html'));
 });
 
-app.get('/search', authenticateAccessToken, (req, res) => {
-    if (!req.user) {
-        return res.redirect('/index');
-    }
-
-    const userRole = req.user.role;
-    const isAdmin = userRole === 'admin';
-    res.render('search', { isAdmin, role: userRole });
-});
-
 app.post('/login-form', async (req, res, next) => {
     const { staffid, password } = req.body;
 
@@ -170,6 +160,16 @@ app.post('/login-form', async (req, res, next) => {
     loginRequest.end(); 
 });
 
+app.get('/search', authenticateAccessToken, (req, res) => {
+    if (!req.user) {
+        return res.redirect('/index');
+    }
+
+    const userRole = req.user.role;
+    const isAdmin = userRole === 'admin';
+    res.render('search', { isAdmin, role: userRole });
+});
+
 app.post('/refresh-token', (req, res) => {
     const refreshToken = req.headers['x-refresh-token'];
 
@@ -202,7 +202,7 @@ app.get('/transactions', authenticateAccessToken, async (req, res) => {
     } else if (ref_name === 'UETR') {
         column = 'UETR';
     } else {
-        return res.status(400).json({ error: 'Invalid reference name.'  });
+        return res.status(400).json({ error: 'Invalid reference name.' });
     }
 
     try {
@@ -216,14 +216,14 @@ app.get('/transactions', authenticateAccessToken, async (req, res) => {
 
         if (results.length > 0) {
             res.json(results.map(result => {
-                return { ...result, ref_name, ref_value: result[column] };
+                return { ...result, ref_name, ref_value: result[column]};
             }));
         } else {
-            res.status(404).json({ error: 'Transaction not found' });
+            res.status(500).json({ error: 'Error retrieving transaction' });
         }
     } catch (error) {
         console.error('Error retrieving transaction:', error);
-        res.status(500).json({ error: 'Error retrieving transaction' });
+        res.status(500).send('Error retrieving transaction');
     }
 });
 

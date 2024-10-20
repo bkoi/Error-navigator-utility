@@ -34,11 +34,11 @@ const login = async (req, res) => {
         );
 
         //Redirect based on user role
-        if (existingUser.role === 'admin' || existingUser.role) {
+        if (existingUser.role === 'admin' || existingUser.role === 'business_user') {
             return res.status(200).json({ staffid: existingUser.staffid, role: existingUser.role, accessToken: accessToken });
         } else {
             console.log('Unauthorized role: ' , staffid);
-            return res.status(403).send('Your accounr does not have access to this application. Please contact your administrator.');
+            return res.status(403).send('Your account does not have access to this application. Please contact your administrator.');
         }
     } catch (error) {
         console.log(' Error during login: ', error);
@@ -49,13 +49,13 @@ const login = async (req, res) => {
 // Middleware to authenticate the token
 const authenticateAccessToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const accessToken = authHeader && authHeader.split(' ')[1];
 
-    if (!token) {
+    if (!accessToken) {
         return res.status(401).json({ error: 'Access token is missing or invalid' }); // Unauthorized
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
+    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
         if (error) {
             return res.status(403).json({ error: 'Token is invalid or expired' }); // Forbidden
         }

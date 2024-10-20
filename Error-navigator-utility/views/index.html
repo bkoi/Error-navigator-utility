@@ -73,14 +73,14 @@
 
                     fetch('/auth/login', {
                         method: 'POST',
-                        headers: { staffid: staffid, password: password },
+                        headers: { staffid: staffid, password: password }
                     }).then(response => response.json())
                     .then(data => {
                         console.log(data);
                         localStorage.setItem('accessToken', data.accessToken);
                         window.location.href = '/search';
                     }).catch(error => {
-                        console.error('Error logging in', error);
+                        console.error('Error logging in:', error);
                         alert('Error logging in. Please try again.');
                     });
                     return true; 
