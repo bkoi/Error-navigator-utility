@@ -28,7 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (refNameSelect) {
         refNameSelect.addEventListener('change', updateInputField);  
     }
+
+    window.addEventListener('beforeunload', function() {
+        fetch('/auth/logout', {
+            method: 'POST'
+        });
+    });
 });
+
+function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input; 
+    return div.innerHTML;
+}
 
 let loginAttempts = 0;
 const maxAttempts = 3;
@@ -277,9 +289,9 @@ function goBackToSearch() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const queryParams = new URLSearchParams(window.location.search);
-    const refName = queryParams.get('ref_name');
-    const refValue = queryParams.get('ref_value');
-    const createdDate = queryParams.get('createddate');
+    const refName = sanitizeInput(queryParams.get('ref_name')); 
+    const refValue = sanitizeInput(queryParams.get('ref_value'));  
+    const createdDate = sanitizeInput(queryParams.get('createddate'));  
 
     if (refName) {
         document.getElementById('ref_name').value = refName;
@@ -292,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('createddate').value = createdDate;
     }
 });
+
 
 function navigateToSearch(event) {
     window.location.href ='/search';   

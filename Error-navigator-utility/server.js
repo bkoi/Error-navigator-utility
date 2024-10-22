@@ -17,6 +17,8 @@ const port = process.env.PORT;
 
 const app = express();
 
+app.use(helmet.xssFilter());
+
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
@@ -47,12 +49,15 @@ app.use(
     })
 );
 
-
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }  // Set this to true if using HTTPS
+    cookie: {
+        secure: false,  // Set to true if using HTTPS 
+        expires: new Date(Date.now() + 60000),
+        sameSite: true 
+    }
 }));
 
 app.use(express.static(path.join(__dirname, 'assets')));
@@ -128,6 +133,11 @@ app.post('/login-form', async (req, res, next) => {
 
     console.log('Received headers:', { staffid: staffid, password: password });
 
+    const sessionExpiresAt = Date.now() + 1 * 60 * 1000;
+
+    req.session.user = { staffid, role: userRole, expiresAt: sessionExpiresAt };
+    res.redirect('/search');
+
     if(!staffid || !password) {
         return res.status(400).json('Staff ID or password field cannot be empty');
     }
@@ -196,14 +206,19 @@ app.post('/login-form', async (req, res, next) => {
 });
 
 app.get('/search', authenticateAccessToken, (req, res) => {
-    if (!req.user) {
-        return res.redirect('/index');
+    if (!req.session.user || Date.now() > req.session.user.expiresAt) {
+        // Invalidate session if expired
+        req.session.destroy(err => {
+            res.clearCookie('connect.sid');
+            return res.redirect('/index');
+        });
+    } else {
+        const userRole = req.session.user.role;
+        const isAdmin = userRole === 'admin';
+        res.render('search', { isAdmin, role: userRole });
     }
-
-    const userRole = req.user.role;
-    const isAdmin = userRole === 'admin';
-    res.render('search', { isAdmin, role: userRole });
 });
+
 
 app.post('/refresh-token', (req, res) => {
     const refreshToken = req.headers['x-refresh-token'];
@@ -306,6 +321,16 @@ app.delete('/transactions/delete', authenticateAccessToken, async (req, res) => 
         return res.status(403).json({ error: 'Unauthorized action. Only admin users can delete transactions.' });
     }
     // Delete logic here
+});
+
+app.post('/auth/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Failed to log out.');
+        }
+        res.clearCookie('connect.sid');  
+        res.send('Logged out successfully');
+    });
 });
 
 const server = app.listen(port, () => console.log(`Server connected to port ${port}`));
