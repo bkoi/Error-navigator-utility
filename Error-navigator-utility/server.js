@@ -91,7 +91,10 @@ app.get('/result', (req, res) => {
 });
 
 app.post('/login-form', async (req, res, next) => {
-    const { staffid, password } = req.body;
+    const staffid = req.headers['staffid'];
+    const password = req.headers['password'];
+
+    console.log('Received headers:', { staffid: staffid, password: password });
 
     if(!staffid || !password) {
         return res.status(400).json('Staff ID or password field cannot be empty');

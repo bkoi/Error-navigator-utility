@@ -71,16 +71,22 @@
                     loginAttempts++;
                     setTimeout(() => { loginAttempts = 0; }, lockoutTime);
 
+                    console.log('Sending headers:', { staffid: staffid, password: password });
+
                     fetch('/auth/login', {
                         method: 'POST',
                         headers: { staffid: staffid, password: password }
-                    }).then(response => response.json())
-                    .then(data => {
+                    }).then(response =>  {
+                        if (!response.ok) {
+                            throw new Error('HTTP error! Status: ' + response.status);
+                        }
+                        return response.json();
+                    }).then(data => {
                         console.log(data);
                         localStorage.setItem('accessToken', data.accessToken);
                         window.location.href = '/search';
                     }).catch(error => {
-                        console.error('Error logging in:', error);
+                        console.log('Error logging in:', error);
                         alert('Error logging in. Please try again.');
                     });
                     return true; 

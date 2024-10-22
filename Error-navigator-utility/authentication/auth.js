@@ -6,6 +6,7 @@ const { checkRecordExists, updateRecord, generateAccessToken } = require('../uti
 const login = async (req, res) => {
     const staffid = req.headers['staffid'];
     const password = req.headers['password'];
+    console.log('Sending headers:', { staffid: staffid, password: password });
     //const salt = 10;
 
     if (!staffid || !password) {
