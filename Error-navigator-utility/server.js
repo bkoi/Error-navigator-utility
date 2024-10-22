@@ -12,9 +12,41 @@ const crypto = require('crypto');
 //const sessionSecret = crypto.randomBytes(32).toString('hex');
 const http = require('http');
 const { authenticateAccessToken } = require('./authentication/auth');
+const helmet = require('helmet');
 const port = process.env.PORT;
 
 const app = express();
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],  // Default: load resources from your own domain
+            scriptSrc: [
+                "'self'", 
+                "https://cdn.jsdelivr.net",  // Allow scripts from jsDelivr (Bootstrap, etc.)
+            ],
+            scriptSrcElem: [
+                "'self'", 
+                "https://cdn.jsdelivr.net"  // Explicitly allow external script elements from jsDelivr
+            ],
+            styleSrc: [
+                "'self'", 
+                "https://cdn.jsdelivr.net",  // Allow CSS from jsDelivr (Bootstrap CSS)
+                "https://fonts.googleapis.com",  // Allow Google Fonts
+                "https://fonts.gstatic.com"  // Google Fonts
+            ],
+            imgSrc: ["'self'", "data:"],  // Allow images from your domain and data URIs
+            fontSrc: [
+                "'self'", 
+                "https://fonts.googleapis.com", 
+                "https://fonts.gstatic.com"
+            ],  // Allow fonts from Google Fonts
+            objectSrc: ["'none'"],  // Disallow <object> tags
+            upgradeInsecureRequests: []  // Automatically upgrade HTTP to HTTPS
+        },
+    })
+);
+
 
 app.use(session({
     secret: process.env.SESSION_SECRET,

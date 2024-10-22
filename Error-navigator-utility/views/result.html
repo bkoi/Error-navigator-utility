@@ -10,54 +10,7 @@
         <link rel="stylesheet" href="/css/style.css" type="text/css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <title>Error Navigator Search Result</title>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const results = JSON.parse(localStorage.getItem('searchResults'));
-
-                if (results && results.length > 0) {
-                    const resultContainer = document.getElementById('result-area');
-                    resultContainer.innerHTML = '';
-
-                    results.forEach(result => {
-                        const resultItem = document.createElement('div');
-                        resultItem.className = 'result-item';
-                        resultItem.innerHTML = `
-                            <p><strong>Reference Name:</strong> ${result.ref_name}</p>
-                            <p><strong>Reference Value:</strong> ${result.ref_value}</p>
-                            <p><strong>Date:</strong> ${result.createddate}</p>
-                            <p><strong>Event Description:</strong> ${result.event_desc}</p>
-                            <p><strong>Root Cause:</strong> ${result.root_cause}</p>
-                        `;
-                        resultContainer.appendChild(resultItem);
-                    });
-                } else {
-                    document.getElementById('result-area').innerHTML = '<p>No results found</p>';
-                }
-            });
-    
-            function goBackToSearch() {
-                const refName = "<%= transactions[0].messegid ? 'MSGID' : 'F20' %>";
-                const refValue = "<%= transactions[0].messegid || transactions[0].F20 %>";
-                const createdDate = "<%= new Date(transactions[0].createddate).toISOString().split('T')[0] %>";
-
-                const url = `/search?ref_name=${refName}&ref_value=${refValue}&createddate=${createdDate}`;
-
-                window.location.href = url;
-            };
-
-            function navigateToLogOut(event) {
-            fetch('close-connection', { 
-                method: 'POST'
-            }).then(response => {
-                alert("You are logged out.");
-                window.location.href = '/index';
-            }).catch(error => {
-                console.error('Error closing connection', error);
-                alert("Error logging out, but you are still logged out.");
-                window.location.href = '/index';
-                });
-            };
-        </script>
+        <script src="/js/app.js"></script>
     </head>
     <body>
         <!--Header with Hamburger Navbar-->
@@ -85,7 +38,7 @@
                                     <a class="nav-link" href="/search">Reload</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" onclick="navigateToLogOut(this)">Logout</a>
+                                    <a class="nav-link" id="logoutButton">Logout</a>
                                 </li>
                             </ul>
                         </div>
@@ -112,10 +65,10 @@
             <section>
                 <div class="row align-items-center justify-content-center mt-5">
                     <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                        <button type="button" class="btn submit-btn" onclick="goBackToSearch(this)">Back to Search</button>
+                        <button type="button" class="btn submit-btn" id="backButton">Back to Search</button>
                     </div>
                     <div class="col-4 col-sm-2 d-flex rounded btn-text-center mb-1 px-3">
-                        <button type="button" class="btn submit-btn" onclick="navigateToLogOut(this)">Logout</button>
+                        <button type="button" class="btn submit-btn" id="logoutButton">Logout</button>
                     </div>
                 </div> 
             </section>
