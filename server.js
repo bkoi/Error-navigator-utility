@@ -76,7 +76,6 @@ app.use('/auth', authRoutes);
 //app.use(transactionsRoutes);
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 
 connectDB();
 
@@ -116,15 +115,15 @@ process.on('exit', (code) => {
 });
 
 app.get('/index', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views/index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/search', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views/search.html'));
+    res.sendFile(path.join(__dirname, 'search.html'));
 });
 
 app.get('/result', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views/result.html'));
+    res.sendFile(path.join(__dirname, 'result.html'));
 });
 
 app.post('/login-form', async (req, res, next) => {
