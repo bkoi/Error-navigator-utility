@@ -46,6 +46,9 @@ body {
     color: #fff;
 }
 
+.nav-link {
+    color: #fff;
+}
 #home-link,
 #search-link,
 #result-link,
